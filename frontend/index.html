@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopNow</title>
+  <link rel="stylesheet" href="/src/reset.css" />
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+<body>
+  <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; box-shadow: -2px 23px 115px -6px rgba(0,0,0,0.77);
+-webkit-box-shadow: -2px 23px 115px -6px rgba(0,0,0,0.77);
+-moz-box-shadow: -2px 23px 115px -6px rgba(0,0,0,0.77);">
+    <h1 class="header__title">ShopNow</h1>
+    <nav class="header__nav" style="display: flex; gap: 20px;">
+      <a href="/orders.html" style="text-decoration: none; background-color: white; padding: 5px;">📦</a>
+      <a href="/cart.html" style="text-decoration: none; background-color: white; padding: 5px;">🛒</a>
+      <a href="/login.html" style="text-decoration: none; background-color: aqua; padding: 5px; border-radius: 10%; cursor: pointer;">Login</a>
+    </nav>
+  </header>
+  <main>
+    <section class="product-list" id="product-list">
+
+    </section>
+    <div class="pagination" id="pagination" style="display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin: 20px 0;
+  "></div>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
