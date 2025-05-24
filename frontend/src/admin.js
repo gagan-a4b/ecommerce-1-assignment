@@ -8,6 +8,7 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
   const imageURL = document.getElementById('product-image').value.trim();
   const description = document.getElementById('product-description').value.trim();
   await saveProduct({ name, price, imageURL, description });
+  e.target.reset();
   renderProductsAdmin();
 });
 

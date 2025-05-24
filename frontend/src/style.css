@@ -11,6 +11,11 @@
 .header__nav a {
   color: white;
   margin-left: 1rem;
+  text-decoration: none;
+  background-color: goldenrod;
+  height: 100px;
+  border-radius: 2%;
+  padding: 10px;
 }
 .product-list {
   display: flex;
@@ -70,3 +75,130 @@
   color: white;
   font-weight: bold;
 }
+
+
+/* Page container */
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f7f7f7;
+  padding: 1rem;
+}
+
+/* Form container */
+.auth-form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Title */
+.auth-form__title {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Inputs and Select */
+.auth-form__input,
+.auth-form select {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Labels */
+.auth-form label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+/* Button */
+.auth-form__button {
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-form__button:hover {
+  background-color: #0056b3;
+}
+
+/* Message below the form */
+.auth-form__message {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.auth-form__message a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-form__message a:hover {
+  text-decoration: underline;
+}
+
+
+/* Admin form container */
+.product-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Input fields */
+.product-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Submit button */
+.product-form button {
+  padding: 0.75rem;
+  background-color: #28a745;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.product-form button:hover {
+  background-color: #218838;
+}
+
+
+

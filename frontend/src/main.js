@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initializePagination() {
   const products = getProducts();
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(products.length / itemsPerPage);
   let currentPage = 1;
 
@@ -21,7 +21,7 @@ function initializePagination() {
     const productsToShow = products.slice(start, end);
 
     productList.innerHTML = productsToShow.map(p => `
-      <div style="border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px;">
+      <div class="product-card" style="border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px; display: inline-block; height: 300px; width: 200px;">
         <img src="${p.imageURL}" alt="${p.name}" style="width: 150px; height: 150px;">
         <h3>${p.name}</h3>
         <p>$${p.price}</p>

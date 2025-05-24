@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (clearCartBtn) clearCartBtn.style.display = 'inline-block';
     if (checkoutBtn) checkoutBtn.style.display = 'inline-block';
-    //if (continueShoppingBtn) continueShoppingBtn.style.display = 'none';
   }
 
   renderCart();

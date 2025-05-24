@@ -1,19 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Signup</title>
-  <link rel="stylesheet" href="/src/reset.css">
-  <link rel="stylesheet" href="/src/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup | ShopNow</title>
+  <link rel="stylesheet" href="/src/reset.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
-  <h2>Sign Up</h2>
-  <form id="signup-form">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <button type="submit">Sign Up</button>
-  </form>
+  <header class="header">
+    <h1 class="header__title">ShopNow</h1>
+    <nav class="header__nav"><a href="/index.html">Go to Website</a></nav>
+  </header>
+  <main class="login">
+    <form class="auth-form" id="signup-form">
+      <h1 class="auth-form__title">Sign Up</h1>
+      
+      <label for="username">Username</label>
+      <input type="text" class="auth-form__input" id="username" required />
+
+      <label for="password">Password</label>
+      <input type="password" class="auth-form__input" id="password" required />
+
+      <label for="email">Email</label>
+      <input type="email" class="auth-form__input" id="email" required />
+
+      <button type="submit" class="auth-form__button">Sign Up</button>
+    </form>
+    
+    <p class="auth-form__message">Already have an account? <a href="/login.html">Login</a></p>
+  </main>
 
   <script type="module">
     import { signup } from '/src/auth.js';

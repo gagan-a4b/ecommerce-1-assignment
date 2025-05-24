@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | ShopNow</title>
-  <link rel="stylesheet" href="/src/reset.css" />
-  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="./src/reset.css" />
+  <link rel="stylesheet" href="./src/style.css" />
 </head>
 <body>
+  <header class="header">
+    <h1 class="header__title">ShopNow</h1>
+    <nav class="header__nav"><a href="/index.html">Go to Website</a></nav>
+  </header>
   <main class="login">
     <form class="auth-form" id="login-form">
         <select>
@@ -21,7 +25,7 @@
       <input type="password" class="auth-form__input" id="password" required />
       <button type="submit" class="auth-form__button">Login</button>
     </form>
-    <p class="auth-form__message">Don't have an account? <a href="/register.html">Register</a></p>
+    <p class="auth-form__message" style="text-align: center; margin: 0 auto; width: fit-content;">Don't have an account? <a href="/register.html">Register</a></p>
   </main>
   <script type="module">
     import { login } from '/src/auth.js';
