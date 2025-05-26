@@ -1,13 +1,15 @@
-import { checkLoginStatus } from './auth.js';
-import { getProducts } from './api.js';
+import { checkLoginStatus, getToken } from './auth.js';
+import { fetchProducts } from './api.js';
+
+const API_URL = "http://localhost:3000/api/cart";
 
 document.addEventListener('DOMContentLoaded', () => {
   checkLoginStatus();
   initializePagination();
 });
 
-function initializePagination() {
-  const products = getProducts();
+async function initializePagination() {
+  const products = await fetchProducts();
   const itemsPerPage = 5;
   const totalPages = Math.ceil(products.length / itemsPerPage);
   let currentPage = 1;
@@ -22,10 +24,10 @@ function initializePagination() {
 
     productList.innerHTML = productsToShow.map(p => `
       <div class="product-card" style="border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px; display: inline-block; height: 300px; width: 200px;">
-        <img src="${p.imageURL}" alt="${p.name}" style="width: 150px; height: 150px;">
+        <img src="${p.image}" alt="${p.name}" style="width: 150px; height: 150px;">
         <h3>${p.name}</h3>
         <p>$${p.price}</p>
-        <button class="add-to-cart" data-id="${p.id}">Add to Cart</button>
+        <button class="add-to-cart" data-id="${p.productId}" data-price="${p.price}">Add to Cart</button>
       </div>
     `).join('');
   }
@@ -48,27 +50,53 @@ function initializePagination() {
   renderProducts(currentPage);
   renderPagination();
 
-  // Event delegation for "Add to Cart"
-  productList.addEventListener('click', (e) => {
-    if (e.target.classList.contains('add-to-cart')) {
-      const productId = parseInt(e.target.dataset.id);
-      const product = products.find(p => p.id === productId);
-      if (product) {
-        addToCart(product);
-      }
+  // Add to Cart Handler
+  productList.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('add-to-cart')) {
+    if (!getToken()) {
+      alert("Please log in to add items to your cart.");
+      return;
     }
-  });
-}
 
-function addToCart(product) {
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const existing = cart.find(p => p.id === product.id);
-  if (existing) {
-    alert(`${product.name} is already in the cart.`);
-    return;
+    const productId = parseInt(e.target.dataset.id);
+    const price = parseFloat(e.target.dataset.price);
+    const quantity = 1;
+
+    if (isNaN(productId)) {
+      console.error("Invalid product ID");
+      alert("Could not add this item to the cart.");
+      return;
+    }
+
+    try {
+      await addToCart(productId, quantity, price);
+    } catch (err) {
+      console.error(err);
+    }
   }
-
-  cart.push(product);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  alert(`${product.name} added to cart!`);
+});
 }
+
+async function addToCart(productId, quantity, price) {
+  try {
+    const res = await fetch(`${API_URL}/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ productId, quantity, price })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("Product added to cart!");
+    } else {
+      alert(data.message || "Failed to add to cart");
+    }
+  } catch (error) {
+    console.error('Failed to add to cart:', error);
+    alert("Error adding to cart.");
+  }
+}
+

@@ -1,8 +1,9 @@
-import { getProducts, deleteProduct } from './api.js';
+import {  deleteProducts, fetchProducts } from './api.js';
 
-export function loadProducts() {
+export async function loadProducts() {
   const container = document.getElementById('product-list');
-  const products = getProducts();
+  const products = await fetchProducts();
+  console.log('Products loaded:', products);
   container.innerHTML = products.map(p => `
     
     <article class="product-card" style="
@@ -19,7 +20,7 @@ export function loadProducts() {
   text-align: center;
   font-family: sans-serif;
 ">
-  <img src="${p.imageURL}" alt="${p.name}" class="product-card__image" style="
+  <img src="${p.image}" alt="${p.name}" class="product-card__image" style="
     width: 100%;
     height: 180px;
     object-fit: cover;
@@ -38,7 +39,7 @@ export function loadProducts() {
     color: #555;
     margin-bottom: 10px;
   ">$${p.price}</p>
-  <button href="#" data-id="${p.id}" class="product-card__button add-to-cart" style="
+  <button href="#" data-id="${p.productId}" class="product-card__button add-to-cart" style="
     display: inline-block;
     background-color: #007bff;
     color: white;
@@ -55,9 +56,9 @@ export function loadProducts() {
   `).join('');
 }
 
-export function renderProductsAdmin() {
+ export async function renderProductsAdmin() {
   const container = document.getElementById('admin-product-list');
-  const products = getProducts();
+  const products = await fetchProducts();
   container.innerHTML = products.map(p => `
     <article class="product-card"
     style="
@@ -74,7 +75,7 @@ export function renderProductsAdmin() {
   text-align: center;
   font-family: sans-serif;
 ">
-<img src="${p.imageURL}" alt="${p.name}" style="
+<img src="${p.image}" alt="${p.name}" style="
     width: 100%;
     height: 180px;
     object-fit: cover;
@@ -94,12 +95,13 @@ export function renderProductsAdmin() {
     margin-bottom: 10px;
   ">$${p.price}</p>
       
-      <button data-id="${p.id}" class="delete-btn">Delete</button>
+      <button data-id="${p.productId}" class="delete-btn">Delete</button>
+      <button data-id="${p.productId}" class="edit-btn">Edit</button>
     </article>
   `).join('');
   container.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      deleteProduct(Number(btn.dataset.id));
+      deleteProducts(Number(btn.dataset.id));
       renderProductsAdmin();
     });
   });

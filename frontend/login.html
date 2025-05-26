@@ -12,29 +12,40 @@
     <h1 class="header__title">ShopNow</h1>
     <nav class="header__nav"><a href="/index.html">Go to Website</a></nav>
   </header>
+
   <main class="login">
     <form class="auth-form" id="login-form">
-        <select>
+      <h1 class="auth-form__title">Login</h1>
+
+      <label for="role">Login As:</label>
+      <select id="role" class="auth-form__input">
         <option value="user">User</option>
         <option value="admin">Admin</option>
       </select>
-      <h1 class="auth-form__title">Login</h1>
+
       <label for="username">Username</label>
       <input type="text" class="auth-form__input" id="username" required />
+
       <label for="password">Password</label>
       <input type="password" class="auth-form__input" id="password" required />
+
       <button type="submit" class="auth-form__button">Login</button>
     </form>
-    <p class="auth-form__message" style="text-align: center; margin: 0 auto; width: fit-content;">Don't have an account? <a href="/register.html">Register</a></p>
+
+    <p class="auth-form__message" style="text-align: center; margin-top: 1rem;">
+      Don't have an account? <a href="/register.html">Register</a>
+    </p>
   </main>
+
   <script type="module">
     import { login } from '/src/auth.js';
+
     document.getElementById('login-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      const username = document.getElementById('username').value.trim();
+      const userId = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      const role = document.querySelector('select').value;
-      login(username, password, role);
+      const role = document.getElementById('role').value;
+      login(userId, password, role);
     });
   </script>
 </body>

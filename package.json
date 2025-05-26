@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^8.0.0"
+  }
+}

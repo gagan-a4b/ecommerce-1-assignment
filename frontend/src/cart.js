@@ -1,61 +1,117 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const cartContainer = document.getElementById('cart-items');
-  const clearCartBtn = document.getElementById('clear-cart');
-  const continueShoppingBtn = document.getElementById('continue-shopping');
-  const checkoutBtn = document.getElementById('checkout');
+import { getToken, checkLoginStatus } from './auth.js';
+import { fetchProducts } from './api.js';
 
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+const API_URL = "http://localhost:3000/api/cart";
 
-  function renderCart() {
-    if (cart.length === 0) {
-      cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-      if (clearCartBtn) clearCartBtn.style.display = 'none';
-      if (checkoutBtn) checkoutBtn.style.display = 'none';
-      if (continueShoppingBtn) continueShoppingBtn.style.display = 'block';
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!getToken()) {
+    document.getElementById('cart-items').innerHTML = "<p>Please log in to view your cart.</p>";
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.data || data.data.productInfo.length === 0) {
+      document.getElementById('cart-items').innerHTML = "<p>Your cart is empty.</p>";
       return;
     }
 
-    let total = 0;
-    cartContainer.innerHTML = cart.map(p => {
-      total += p.price;
-      return `
-        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px; border-radius: 5px;">
-          <img src="${p.imageURL}" alt="${p.name}" style="width: 100px; height: 100px; object-fit: cover;">
-          <h3>${p.name}</h3>
-          <p>$${p.price}</p>
-        </div>
-      `;
-    }).join('');
+    const cartItems = data.data.productInfo;
+    const allProducts = await fetchProducts();
 
-    cartContainer.innerHTML += `<p style="font-weight: bold; font-size: 1.2rem; margin-top: 10px;">Total: $${total.toFixed(2)}</p>`;
-
-    if (clearCartBtn) clearCartBtn.style.display = 'inline-block';
-    if (checkoutBtn) checkoutBtn.style.display = 'inline-block';
-  }
-
-  renderCart();
-
-  if (clearCartBtn) {
-    clearCartBtn.addEventListener('click', () => {
-      localStorage.removeItem('cart');
-      cart = [];
-      renderCart();
-      alert('Cart cleared!');
+    const enrichedItems = cartItems.map(item => {
+      const product = allProducts.find(p => p.productId === item.productId);
+      return {
+        ...item,
+        name: product?.name || "Unknown",
+        image: product?.image || "",
+        price: product?.price || 0
+      };
     });
+
+    renderCart(enrichedItems);
+  } catch (err) {
+    console.error('Error loading cart:', err);
+    document.getElementById('cart-items').innerHTML = "<p>Error loading cart.</p>";
   }
+});
+
+function renderCart(items) {
+  const container = document.getElementById('cart-items');
+  container.innerHTML = '';
+
+  let total = 0;
+
+  items.forEach(item => {
+    const itemTotal = item.quantity * item.price;
+    total += itemTotal;
+
+    const div = document.createElement('div');
+    div.className = "cart-item";
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}" width="100">
+      <h4>${item.name}</h4>
+      <p>Price: $${item.price}</p>
+      <p>Quantity: ${item.quantity}</p>
+      <p>Total: $${itemTotal.toFixed(2)}</p>
+      <button class="remove" data-id="${item.productId}">Remove</button>
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('cart-total').textContent = `Total: $${total.toFixed(2)}`;
+
+  container.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('remove')) {
+      const productId = e.target.dataset.id;
+      await removeItem(productId);
+      location.reload(); // Reload cart after removal
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  checkLoginStatus();
+  // loadCart();
+
+  const continueShoppingBtn = document.getElementById('continue-shopping');
+  const checkoutBtn = document.getElementById('checkout-button');
 
   if (continueShoppingBtn) {
     continueShoppingBtn.addEventListener('click', () => {
-      window.location.href = '/index.html';
+      window.location.href = 'index.html';
     });
   }
 
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
-      if (cart.length > 0) {
-        localStorage.setItem('checkout_cart', JSON.stringify(cart));
-        window.location.href = './checkout.html';
-      }
+      window.location.href = 'checkout.html';
     });
   }
 });
+
+
+
+async function removeItem(productId) {
+  try {
+    const res = await fetch(`${API_URL}/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+    const data = await res.json();
+    if (!data.success) {
+      alert("Failed to remove item from cart");
+    }
+  } catch (err) {
+    console.error('Remove error:', err);
+    alert("Error removing item from cart");
+  }
+}

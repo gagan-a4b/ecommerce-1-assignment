@@ -33,36 +33,95 @@ const defaultProducts = [
   { id: 30, name: 'Sharp Aquos R7', description: 'Sharp smartphone', price: 899.99, imageURL: 'https://s3no.cashify.in/cashify/store/product/9fc9da82659049ff95e4b240ae722d41.jpg?p=default&s=lg' }
 ];
 
+//the funtion to call for products
+ export async function fetchProducts(){
+  const response =  await fetch('http://localhost:3000/api/products/');
+  const data = await response.json();
+  const { products } = data;
+  return products;
+}
 
-// Load from localStorage, or fallback to default
-function loadProducts() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    return JSON.parse(stored);
-  } else {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
-    return defaultProducts;
+//the function to create products
+export async function createProduct(product) {
+  const response = await fetch('http://localhost:3000/api/products/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(product),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create product');
   }
+
+  return await response.json();
 }
 
-// Save to localStorage
-function saveProducts(products) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+//the function to update products
+export async function updateProduct(id, product) {
+  console.log('Updating product:', { id, ...product });
+
+  const response = await fetch(`http://localhost:3000/api/products/update/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(product),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update product');
+  }
+
+  return await response.json();
 }
 
-// Public API
-export function getProducts() {
-  return loadProducts();
+//the function to delete products
+export async function deleteProducts(id) {
+  const response = await fetch(`http://localhost:3000/api/products/delete/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete product');
+  }
+
+  return await response.json();
 }
 
-export function saveProduct(product) {
-  const products = loadProducts();
-  product.id = Date.now(); // Unique ID
-  products.push(product);
-  saveProducts(products);
-}
 
-export function deleteProduct(id) {
-  const products = loadProducts().filter(p => p.id !== id);
-  saveProducts(products);
-}
+
+
+// // Load from localStorage, or fallback to default
+// function loadProducts() {
+//   const stored = localStorage.getItem(STORAGE_KEY);
+//   if (stored) {
+//     return JSON.parse(stored);
+//   } else {
+//     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+//     return defaultProducts;
+//   }
+// }
+
+// // Save to localStorage
+// function saveProducts(products) {
+//   localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+// }
+
+// // Public API
+// export function getProducts() {
+//   return loadProducts();
+// }
+
+// export function saveProduct(product) {
+//   const products = loadProducts();
+//   product.id = Date.now(); // Unique ID
+//   products.push(product);
+//   saveProducts(products);
+// }
+
+// export function deleteProduct(id) {
+//   const products = loadProducts().filter(p => p.id !== id);
+//   saveProducts(products);
+// }

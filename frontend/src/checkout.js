@@ -1,94 +1,81 @@
-// document.addEventListener('DOMContentLoaded', () => {
-//   const itemsContainer = document.getElementById('checkout-items');
-//   const totalAmount = document.getElementById('total-amount');
-//   const payBtn = document.getElementById('pay-btn');
+import { getLoggedInUser, getToken } from './auth.js';
 
-//   let cart = JSON.parse(localStorage.getItem('orders')) || [];
-
-//   if (cart.length === 0) {
-//     itemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-//     payBtn.style.display = 'none';
-//     return;
-//   }
-
-//   let total = 0;
-//   itemsContainer.innerHTML = cart.map(p => {
-//     total += p.price;
-//     return `
-//       <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
-//         <img src="${p.imageURL}" alt="${p.name}" style="width: 100px;">
-//         <h3>${p.name}</h3>
-//         <p>$${p.price}</p>
-//       </div>
-//     `;
-//   }).join('');
-
-//   totalAmount.textContent = `Total: $${total.toFixed(2)}`;
-
-//   payBtn.addEventListener('click', () => {
-//     // Save to 'orders' in localStorage
-//     const orders = JSON.parse(localStorage.getItem('orders')) || [];
-//     const order = {
-//       id: Date.now(),
-//       items: cart,
-//       total,
-//       placedAt: new Date().toLocaleString()
-//     };
-//     orders.push(order);
-//     localStorage.setItem('orders', JSON.stringify(orders));
-
-//     // Clear cart
-//     localStorage.removeItem('cart');
-
-//     alert('Payment successful! Order placed.');
-//     window.location.href = './orders.html';
-//   });
-// });
-
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const itemsContainer = document.getElementById('checkout-items');
   const totalAmount = document.getElementById('total-amount');
   const payBtn = document.getElementById('pay-btn');
 
-  let cart = JSON.parse(localStorage.getItem('checkout_cart')) || [];
+  const user = getLoggedInUser();
+  const token = getToken();
 
-  if (cart.length === 0) {
-    itemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-    payBtn.style.display = 'none';
+  if (!user || !token) {
+    alert('Please log in to checkout.');
+    window.location.href = '/login.html';
     return;
   }
 
-  let total = 0;
-  itemsContainer.innerHTML = cart.map(p => {
-    total += p.price;
-    return `
-      <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
-        <img src="${p.imageURL}" alt="${p.name}" style="width: 100px;">
-        <h3>${p.name}</h3>
-        <p>$${p.price}</p>
-      </div>
-    `;
-  }).join('');
+  try {
+    // 1. Fetch cart
+    const res = await fetch('http://localhost:3000/api/cart', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  totalAmount.textContent = `Total: $${total.toFixed(2)}`;
+    const cartResponse = await res.json();
+    // console.log("Cart data:", cartResponse);
 
-  payBtn.addEventListener('click', () => {
-    const previousOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    const newOrder = {
-      id: Date.now(),
-      items: cart,
-      total,
-      placedAt: new Date().toLocaleString()
-    };
-    previousOrders.push(newOrder);
-    localStorage.setItem('orders', JSON.stringify(previousOrders));
+    const productInfo = cartResponse?.data?.productInfo || [];
 
-    // Clear cart and checkout_cart
-    localStorage.removeItem('cart');
-    localStorage.removeItem('checkout_cart');
+    if (productInfo.length === 0) {
+      itemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+      payBtn.style.display = 'none';
+      return;
+    }
 
-    alert('Payment successful! Order placed.');
-    window.location.href = './orders.html';
-  });
+    // 2. Fetch product details for each item
+    const productDetails = await Promise.all(productInfo.map(async (item) => {
+      const productRes = await fetch(`http://localhost:3000/api/products/${item.productId}`);
+      const productData = await productRes.json();
+      return {
+        ...productData,
+        quantity: item.quantity
+      };
+    }));
+
+    // 3. Render items
+    let total = 0;
+    itemsContainer.innerHTML = productDetails.map(p => {
+      total += p.price * p.quantity;
+      return `
+        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+          <img src="${p.image}" alt="${p.name}" style="width: 100px;">
+          <h3>${p.name}</h3>
+          <p>$${p.price} x ${p.quantity}</p>
+        </div>
+      `;
+    }).join('');
+    totalAmount.textContent = `Total: $${total.toFixed(2)}`;
+
+    // 4. Handle payment
+    payBtn.addEventListener('click', async () => {
+      const response = await fetch('http://localhost:3000/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('Payment successful! Order placed.');
+        window.location.href = './orders.html';
+      } else {
+        const error = await response.json();
+        alert('Failed to place order: ' + error.message);
+      }
+    });
+
+  } catch (err) {
+    console.error('Checkout error:', err);
+    itemsContainer.innerHTML = '<p>Something went wrong loading the cart.</p>';
+  }
 });
