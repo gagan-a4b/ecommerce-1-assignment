@@ -1,6 +1,6 @@
 const API_BASE = 'http://localhost:3000/api/users';
 
-// LOGIN
+
 export async function login(username, password, role) {
   if (role === 'admin') {
     if (username === 'admin' && password === 'admin') {
